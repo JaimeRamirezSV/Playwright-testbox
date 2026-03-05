@@ -1,0 +1,86 @@
+class {
+    /**
+     * --------------------------------------------------------------------------
+     * Application Properties: Modify as you see fit!
+     * --------------------------------------------------------------------------
+     */
+    this.name                 = "My BoxLang Application"
+    this.sessionManagement    = true
+    this.sessionTimeout       = createTimespan( 0, 1, 0, 0 )
+    this.setClientCookies     = true
+    this.setDomainCookies     = true
+    this.timezone             = "UTC"
+    this.whiteSpaceManagement = "smart"
+    
+    /**
+     * --------------------------------------------------------------------------
+     * Java Integration
+     * --------------------------------------------------------------------------
+     */
+    this.javaSettings = {
+        loadPaths               : [ expandPath( "./lib" ) ],
+        loadColdFusionClassPath : true,
+        reloadOnChange          : false
+    }
+    
+    /**
+     * --------------------------------------------------------------------------
+     * Location Mappings
+     * --------------------------------------------------------------------------
+     */
+    this.mappings[ "/root" ]   = getDirectoryFromPath( getCurrentTemplatePath() )
+    
+    /**
+     * --------------------------------------------------------------------------
+     * ORM + Datasource Settings
+     * --------------------------------------------------------------------------
+     */
+    this.datasource = ""
+    
+    /**
+     * Fires when the application starts
+     */
+    public boolean function onApplicationStart() {
+        return true
+    }
+    
+    /**
+     * Fires when the application ends
+     *
+     * @appScope The app scope
+     */
+    public void function onApplicationEnd( struct appScope ) {
+    }
+    
+    /**
+     * Fires on every request
+     *
+     * @targetPage The requested page
+     */
+    public boolean function onRequestStart( string targetPage ) {
+        return true
+    }
+    
+    /**
+     * Fires on every session start
+     */
+    public void function onSessionStart() {
+    }
+    
+    /**
+     * Fires on session end
+     *
+     * @sessionScope The session scope
+     * @appScope     The app scope
+     */
+    public void function onSessionEnd( struct sessionScope, struct appScope ) {
+    }
+    
+    /**
+     * On missing template handler
+     *
+     * @template
+     */
+    public boolean function onMissingTemplate( template ) {
+    }
+}

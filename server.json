@@ -1,0 +1,30 @@
+{
+    "name":"Playwright for timebox",
+    "profile":"development",
+    "force":true,
+    "web":{
+        "directoryBrowsing":true,
+        "rewrites":{
+            "enable":true
+        },
+        "http":{
+            "port":"8054"
+        },
+        "ssl":{
+            "enable":true,
+            "port":"8055"
+        }
+    },
+    "jvm":{
+        "javaVersion":"openjdk21_jre",
+        "heapSize":"1024",
+        "args":"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9999"
+    },
+    "app":{
+        "serverHomeDirectory":".engine/boxlang",
+        "cfengine":"boxlang@1.10.1"
+    },
+    "env":{
+        "BOXLANG_DEBUG":true
+    }
+}

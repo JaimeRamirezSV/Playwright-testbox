@@ -1,0 +1,5 @@
+
+<bx:output>
+    <h1>Hello from BoxLang!</h1>
+    <p>The server is running correctly.</p>
+</bx:output>
