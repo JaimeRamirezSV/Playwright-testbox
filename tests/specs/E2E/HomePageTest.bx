@@ -11,11 +11,11 @@ class extends="tests.resources.BaseSpec" {
 	function run() {
 
         variables.browserDefaults = {
-            "headless": false,
-            "slowMo"  : 100
+            "headless": true, // set to false to see the browser during testing
+            "slowMo"  : 0 // set 500 for slow motion to visually see the tests running
         };
 
-        variables.browsers = [ "chromium" ];
+        variables.browsers = [ "chromium", "firefox", "webkit" ];
 
 		forEachBrowser( "Home Page Tests", ( browserName ) => {
 

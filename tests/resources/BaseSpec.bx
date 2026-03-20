@@ -20,7 +20,7 @@ class extends="testbox.system.BaseSpec" {
 	// ---------------------------------------------------------------------------
 
 	property name="browserDefaults" default={
-		"headless": false,
+		"headless": true,
 		"slowMo"  : 0
 	};
 
