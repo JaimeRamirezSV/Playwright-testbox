@@ -187,46 +187,35 @@ class {
 	}
 
 	// ---------------------------------------------------------------------------
-	// Assertions (using Playwright's built-in expect)
+	// Query Methods (return booleans – use TestBox expect() for assertions)
 	// ---------------------------------------------------------------------------
 
 	/**
-	 * Assert that an element matching the selector is visible on the page.
+	 * Check whether an element matching the selector is visible on the page.
+	 *
+	 * @return boolean
 	 */
-	function expectVisible( required string selector ) {
-		var assertLocator = createObject( "java", "com.microsoft.playwright.assertions.PlaywrightAssertions" );
-		try {
-			assertLocator.assertThat( variables.page.locator( arguments.selector ) ).isVisible();
-		} catch ( any e ) {
-			throw( type = "BaseTestService.AssertionError", message = "Expected [#arguments.selector#] to be visible: #e.message#" );
-		}
-		return this;
+	boolean function isVisible( required string selector ) {
+		return variables.page.locator( arguments.selector ).isVisible();
 	}
 
 	/**
-	 * Assert that an element's text content contains the expected text.
+	 * Check whether an element's text content contains the expected text.
+	 *
+	 * @return boolean
 	 */
-	function expectText( required string selector, required string text ) {
-		var assertLocator = createObject( "java", "com.microsoft.playwright.assertions.PlaywrightAssertions" );
-		try {
-			assertLocator.assertThat( variables.page.locator( arguments.selector ) ).containsText( arguments.text );
-		} catch ( any e ) {
-			throw( type = "BaseTestService.AssertionError", message = "Expected [#arguments.selector#] to contain text [#arguments.text#]: #e.message#" );
-		}
-		return this;
+	boolean function hasText( required string selector, required string text ) {
+		var content = variables.page.locator( arguments.selector ).textContent() ?: "";
+		return content.findNoCase( arguments.text ) > 0;
 	}
 
 	/**
-	 * Assert that the current page URL contains the expected string.
+	 * Check whether the current page URL contains the expected string.
+	 *
+	 * @return boolean
 	 */
-	function expectURL( required string url ) {
-		var assertPage = createObject( "java", "com.microsoft.playwright.assertions.PlaywrightAssertions" );
-		try {
-			assertPage.assertThat( variables.page ).hasURL( javacast( "java.util.regex.Pattern", createObject( "java", "java.util.regex.Pattern" ).compile( ".*" & arguments.url & ".*" ) ) );
-		} catch ( any e ) {
-			throw( type = "BaseTestService.AssertionError", message = "Expected URL to contain [#arguments.url#] but was [#variables.page.url()#]: #e.message#" );
-		}
-		return this;
+	boolean function hasURL( required string url ) {
+		return variables.page.url().findNoCase( arguments.url ) > 0;
 	}
 
 	// ---------------------------------------------------------------------------

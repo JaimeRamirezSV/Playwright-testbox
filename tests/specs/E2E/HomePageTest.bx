@@ -35,21 +35,21 @@ class extends="tests.resources.BaseSpec" {
 			} );
 
 			it( "should display the page heading", () => {
-				variables.ui.expectVisible( "##page-title" );
+				expect( variables.ui.isVisible( "##page-title" ) ).toBeTrue();
 				expect( variables.ui.getText( "##page-title" ) ).toBe( "BoxLang Test Page" );
 			} );
 
 			it( "should display the welcome message", () => {
-				variables.ui.expectVisible( "##welcome-message" );
+				expect( variables.ui.isVisible( "##welcome-message" ) ).toBeTrue();
 				expect( variables.ui.getText( "##welcome-message" ) ).toInclude( "Playwright end-to-end testing" );
 			} );
 
 			// ----- Navigation -----
 
 			it( "should show all navigation links", () => {
-				variables.ui.expectVisible( "##nav-home" );
-				variables.ui.expectVisible( "##nav-about" );
-				variables.ui.expectVisible( "##nav-contact" );
+				expect( variables.ui.isVisible( "##nav-home" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##nav-about" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##nav-contact" ) ).toBeTrue();
 			} );
 
 			it( "should have Home link as active", () => {
@@ -59,12 +59,12 @@ class extends="tests.resources.BaseSpec" {
 			// ----- Contact Form -----
 
 			it( "should display the contact form", () => {
-				variables.ui.expectVisible( "##contact-form-section" );
-				variables.ui.expectVisible( "##name" );
-				variables.ui.expectVisible( "##email" );
-				variables.ui.expectVisible( "##message" );
-				variables.ui.expectVisible( "##category" );
-				variables.ui.expectVisible( "##submit-btn" );
+				expect( variables.ui.isVisible( "##contact-form-section" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##name" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##email" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##message" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##category" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##submit-btn" ) ).toBeTrue();
 			} );
 
 			it( "should fill and submit the contact form", () => {
@@ -77,8 +77,8 @@ class extends="tests.resources.BaseSpec" {
 					.check( "##agree" )
 					.click( "##submit-btn" );
 
-				variables.ui.expectVisible( "##form-result" );
-				variables.ui.expectText( "##form-result", "Thank you, John Doe" );
+				expect( variables.ui.isVisible( "##form-result" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##form-result", "Thank you, John Doe" ) ).toBeTrue();
 			} );
 
 			it( "should select a category from the dropdown", () => {
@@ -117,8 +117,8 @@ class extends="tests.resources.BaseSpec" {
 
 				// Click to show
 				variables.ui.click( "##toggle-btn" );
-				variables.ui.expectVisible( "##toggle-content" );
-				variables.ui.expectText( "##toggle-text", "hidden details revealed" );
+				expect( variables.ui.isVisible( "##toggle-content" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##toggle-text", "hidden details revealed" ) ).toBeTrue();
 				expect( variables.ui.getText( "##toggle-btn" ) ).toBe( "Hide Details" );
 
 				// Click to hide again
@@ -157,13 +157,13 @@ class extends="tests.resources.BaseSpec" {
 			// ----- Data Table -----
 
 			it( "should display the users table", () => {
-				variables.ui.expectVisible( "##users-table" );
+				expect( variables.ui.isVisible( "##users-table" ) ).toBeTrue();
 			} );
 
 			it( "should show correct table headers", () => {
-				variables.ui.expectText( "##users-table thead", "ID" );
-				variables.ui.expectText( "##users-table thead", "Name" );
-				variables.ui.expectText( "##users-table thead", "Role" );
+				expect( variables.ui.hasText( "##users-table thead", "ID" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##users-table thead", "Name" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##users-table thead", "Role" ) ).toBeTrue();
 			} );
 
 			it( "should display all user rows", () => {
@@ -173,15 +173,15 @@ class extends="tests.resources.BaseSpec" {
 			} );
 
 			it( "should show correct user data", () => {
-				variables.ui.expectText( "##users-table", "Alice" );
-				variables.ui.expectText( "##users-table", "Bob" );
-				variables.ui.expectText( "##users-table", "Charlie" );
+				expect( variables.ui.hasText( "##users-table", "Alice" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##users-table", "Bob" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##users-table", "Charlie" ) ).toBeTrue();
 			} );
 
 			it( "should show role badges", () => {
-				variables.ui.expectText( "##users-table", "Admin" );
-				variables.ui.expectText( "##users-table", "Editor" );
-				variables.ui.expectText( "##users-table", "Viewer" );
+				expect( variables.ui.hasText( "##users-table", "Admin" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##users-table", "Editor" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##users-table", "Viewer" ) ).toBeTrue();
 			} );
 
 			// ----- Hover Demo -----
@@ -193,22 +193,22 @@ class extends="tests.resources.BaseSpec" {
 
 				// Hover to reveal
 				variables.ui.hover( "##hover-target" );
-				variables.ui.expectVisible( "##hover-result" );
-				variables.ui.expectText( "##hover-result", "You hovered!" );
+				expect( variables.ui.isVisible( "##hover-result" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##hover-result", "You hovered!" ) ).toBeTrue();
 			} );
 
 			// ----- Drag and Drop -----
 
 			it( "should display drag source and drop target", () => {
-				variables.ui.expectVisible( "##drag-source" );
-				variables.ui.expectVisible( "##drop-target" );
-				variables.ui.expectText( "##drag-source", "Drag me" );
-				variables.ui.expectText( "##drop-target", "Drop here" );
+				expect( variables.ui.isVisible( "##drag-source" ) ).toBeTrue();
+				expect( variables.ui.isVisible( "##drop-target" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##drag-source", "Drag me" ) ).toBeTrue();
+				expect( variables.ui.hasText( "##drop-target", "Drop here" ) ).toBeTrue();
 			} );
 
 			it( "should complete a drag and drop operation", () => {
 				variables.ui.dragAndDrop( "##drag-source", "##drop-target" );
-				variables.ui.expectText( "##drop-target", "Dropped!" );
+				expect( variables.ui.hasText( "##drop-target", "Dropped!" ) ).toBeTrue();
 				expect( variables.ui.getAttribute( "##drop-target", "class" ) ).toInclude( "dropped" );
 			} );
 
