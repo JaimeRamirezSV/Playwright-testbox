@@ -1,5 +1,4 @@
 /testbox
 /.engine
-/.tmp
-/lib/*
 /tests/lib
+/tests/.tmp/**

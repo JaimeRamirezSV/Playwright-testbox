@@ -12,7 +12,7 @@ class extends="tests.resources.BaseSpec" {
 
         variables.browserDefaults = {
             "headless": false,
-            "slowMo"  : 1500
+            "slowMo"  : 100
         };
 
         variables.browsers = [ "chromium" ];
