@@ -17,11 +17,7 @@ class {
      * Java Integration
      * --------------------------------------------------------------------------
      */
-    this.javaSettings = {
-        loadPaths               : [ expandPath( "./lib" ) ],
-        loadColdFusionClassPath : true,
-        reloadOnChange          : false
-    }
+    this.javaSettings = {}
     
     /**
      * --------------------------------------------------------------------------

@@ -11,8 +11,7 @@
             "port":"4099"
         },
         "ssl":{
-            "enable":true,
-            "port":"9099"
+            "enable":false
         }
     },
     "jvm":{
