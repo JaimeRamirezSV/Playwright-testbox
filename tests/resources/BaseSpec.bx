@@ -45,9 +45,11 @@ class extends="testbox.system.BaseSpec" {
 
 	property name="browserDefaults" default={
 		"headless": false,
-		"slowMo"  : 2000,
-		"browser" : "chromium"
+		"slowMo"  : 500
 	};
+
+	/** Browsers to run every test suite against. */
+	property name="browsers" default=[ "chromium", "firefox", "webkit" ];
 
 	// ---------------------------------------------------------------------------
 	// Helpers
@@ -55,15 +57,43 @@ class extends="testbox.system.BaseSpec" {
 
 	/**
 	 * Create a PlaywrightService pre-configured with the shared settings.
-	 * Override browserDefaults in a subclass to customise per-suite.
+	 *
+	 * @browser  Override the browser engine for this instance (e.g. "firefox").
 	 */
-	function createUI() {
+	function createUI( string browser = "chromium" ) {
 		return new tests.resources.PlaywrightService(
 			baseURL  = variables.baseURL,
 			headless = variables.browserDefaults.headless,
 			slowMo   = variables.browserDefaults.slowMo,
-			browser  = variables.browserDefaults.browser
+			browser  = arguments.browser
 		);
+	}
+
+	/**
+	 * Run a block of specs once per browser engine.
+	 *
+	 * Usage inside run():
+	 *   forEachBrowser( ( browserName ) => {
+	 *       beforeEach( () => { variables.ui = createUI( browserName ); ... } );
+	 *       it( "should ...", () => { ... } );
+	 *   } );
+	 *
+	 * This generates a describe() per browser so results are grouped:
+	 *   [chromium] Login Tests
+	 *   [firefox]  Login Tests
+	 *   [webkit]   Login Tests
+	 *
+	 * @label    Optional suite label. Defaults to "Cross-browser tests".
+	 * @body     Closure that receives the browser name as its single argument.
+	 */
+	function forEachBrowser( required string label, required function specs ) {
+		var suiteLabel = label;
+		var suiteSpecs = specs;
+		for ( var browserName in variables.browsers ) {
+			describe( "[#browserName#] #suiteLabel#", () => {
+				suiteSpecs( browserName );
+			} );
+		}
 	}
 
 }

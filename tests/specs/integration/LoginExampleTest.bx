@@ -10,11 +10,10 @@ class extends="tests.resources.BaseSpec" {
 
 	function run() {
 
-		describe( "Login Page Tests (using BaseTestService)", () => {
+		forEachBrowser( "Login Page Tests", ( browserName ) => {
 
 			beforeEach( () => {
-				variables.ui = createUI();
-
+				variables.ui = createUI( browserName );
 				variables.ui.goTo( "/login" );
 			} );
 
@@ -26,7 +25,7 @@ class extends="tests.resources.BaseSpec" {
 
 			it( "should load the login page with correct title", () => {
 				expect( variables.ui.getTitle() ).toInclude( "TIMEBOX" );
-			} );
+			} ); 
 
 			/* it( "should display all login form elements", () => {
 				variables.ui
@@ -39,8 +38,8 @@ class extends="tests.resources.BaseSpec" {
 
 			/* it( "should mask the password field", () => {
 				expect( variables.ui.getAttribute( variables.selectors.passwordInput, "type" ) ).toBe( "password" );
-			} );
- */
+			} ); */
+
 			// ----- Invalid credentials flow -----
 
 			/* it( "should reject invalid credentials and stay on login", () => {
