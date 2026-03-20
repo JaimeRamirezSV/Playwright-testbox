@@ -1,0 +1,212 @@
+/**
+ * Home Page Tests
+ *
+ * Tests for the main index.bxm page: header, form submission, toggle,
+ * counter, data table, hover interaction, and drag-and-drop.
+ */
+class extends="tests.resources.BaseSpec" {
+
+	property name="ui";
+
+	function run() {
+
+		forEachBrowser( "Home Page Tests", ( browserName ) => {
+
+			beforeEach( () => {
+				variables.ui = createUI( browserName );
+				variables.ui.goTo( "/index.bxm" );
+			} );
+
+			afterEach( () => {
+				variables.ui.close();
+			} );
+
+			// ----- Page Load & Header -----
+
+			it( "should load the home page with correct title", () => {
+				expect( variables.ui.getTitle() ).toInclude( "BoxLang Test Page" );
+			} );
+
+			it( "should display the page heading", () => {
+				variables.ui.expectVisible( "##page-title" );
+				expect( variables.ui.getText( "##page-title" ) ).toBe( "BoxLang Test Page" );
+			} );
+
+			it( "should display the welcome message", () => {
+				variables.ui.expectVisible( "##welcome-message" );
+				expect( variables.ui.getText( "##welcome-message" ) ).toInclude( "Playwright end-to-end testing" );
+			} );
+
+			// ----- Navigation -----
+
+			it( "should show all navigation links", () => {
+				variables.ui.expectVisible( "##nav-home" );
+				variables.ui.expectVisible( "##nav-about" );
+				variables.ui.expectVisible( "##nav-contact" );
+			} );
+
+			it( "should have Home link as active", () => {
+				expect( variables.ui.getAttribute( "##nav-home", "class" ) ).toInclude( "active" );
+			} );
+
+			// ----- Contact Form -----
+
+			it( "should display the contact form", () => {
+				variables.ui.expectVisible( "##contact-form-section" );
+				variables.ui.expectVisible( "##name" );
+				variables.ui.expectVisible( "##email" );
+				variables.ui.expectVisible( "##message" );
+				variables.ui.expectVisible( "##category" );
+				variables.ui.expectVisible( "##submit-btn" );
+			} );
+
+			it( "should fill and submit the contact form", () => {
+				variables.ui
+					.fill( "##name", "John Doe" )
+					.fill( "##email", "john@example.com" )
+					.fill( "##message", "Hello from Playwright!" )
+					.selectOption( "##category", "support" )
+					.check( "##priority-high" )
+					.check( "##agree" )
+					.click( "##submit-btn" );
+
+				variables.ui.expectVisible( "##form-result" );
+				variables.ui.expectText( "##form-result", "Thank you, John Doe" );
+			} );
+
+			it( "should select a category from the dropdown", () => {
+				variables.ui.selectOption( "##category", "feedback" );
+				// Verify the select has the right value by checking the page state
+				var page = variables.ui.getPage();
+				var selectedValue = page.locator( "##category" ).inputValue();
+				expect( selectedValue ).toBe( "feedback" );
+			} );
+
+			it( "should check and uncheck the terms checkbox", () => {
+				variables.ui.check( "##agree" );
+				var page = variables.ui.getPage();
+				expect( page.locator( "##agree" ).isChecked() ).toBeTrue();
+
+				variables.ui.uncheck( "##agree" );
+				expect( page.locator( "##agree" ).isChecked() ).toBeFalse();
+			} );
+
+			it( "should select a radio button for priority", () => {
+				variables.ui.check( "##priority-low" );
+				var page = variables.ui.getPage();
+				expect( page.locator( "##priority-low" ).isChecked() ).toBeTrue();
+
+				variables.ui.check( "##priority-high" );
+				expect( page.locator( "##priority-high" ).isChecked() ).toBeTrue();
+				expect( page.locator( "##priority-low" ).isChecked() ).toBeFalse();
+			} );
+
+			// ----- Toggle Demo -----
+
+			it( "should toggle content visibility on button click", () => {
+				// Content initially hidden
+				var page = variables.ui.getPage();
+				expect( page.locator( "##toggle-content" ).isVisible() ).toBeFalse();
+
+				// Click to show
+				variables.ui.click( "##toggle-btn" );
+				variables.ui.expectVisible( "##toggle-content" );
+				variables.ui.expectText( "##toggle-text", "hidden details revealed" );
+				expect( variables.ui.getText( "##toggle-btn" ) ).toBe( "Hide Details" );
+
+				// Click to hide again
+				variables.ui.click( "##toggle-btn" );
+				expect( page.locator( "##toggle-content" ).isVisible() ).toBeFalse();
+				expect( variables.ui.getText( "##toggle-btn" ) ).toBe( "Show Details" );
+			} );
+
+			// ----- Counter -----
+
+			it( "should start counter at zero", () => {
+				expect( variables.ui.getText( "##counter-value" ) ).toBe( "0" );
+			} );
+
+			it( "should increment the counter", () => {
+				variables.ui.click( "##increment-btn" );
+				expect( variables.ui.getText( "##counter-value" ) ).toBe( "1" );
+
+				variables.ui.click( "##increment-btn" );
+				expect( variables.ui.getText( "##counter-value" ) ).toBe( "2" );
+			} );
+
+			it( "should decrement the counter", () => {
+				variables.ui.click( "##decrement-btn" );
+				expect( variables.ui.getText( "##counter-value" ) ).toBe( "-1" );
+			} );
+
+			it( "should increment and decrement sequentially", () => {
+				variables.ui.click( "##increment-btn" );
+				variables.ui.click( "##increment-btn" );
+				variables.ui.click( "##increment-btn" );
+				variables.ui.click( "##decrement-btn" );
+				expect( variables.ui.getText( "##counter-value" ) ).toBe( "2" );
+			} );
+
+			// ----- Data Table -----
+
+			it( "should display the users table", () => {
+				variables.ui.expectVisible( "##users-table" );
+			} );
+
+			it( "should show correct table headers", () => {
+				variables.ui.expectText( "##users-table thead", "ID" );
+				variables.ui.expectText( "##users-table thead", "Name" );
+				variables.ui.expectText( "##users-table thead", "Role" );
+			} );
+
+			it( "should display all user rows", () => {
+				var page = variables.ui.getPage();
+				var rowCount = page.locator( "##users-table tbody tr" ).count();
+				expect( rowCount ).toBe( 3 );
+			} );
+
+			it( "should show correct user data", () => {
+				variables.ui.expectText( "##users-table", "Alice" );
+				variables.ui.expectText( "##users-table", "Bob" );
+				variables.ui.expectText( "##users-table", "Charlie" );
+			} );
+
+			it( "should show role badges", () => {
+				variables.ui.expectText( "##users-table", "Admin" );
+				variables.ui.expectText( "##users-table", "Editor" );
+				variables.ui.expectText( "##users-table", "Viewer" );
+			} );
+
+			// ----- Hover Demo -----
+
+			it( "should show message on hover", () => {
+				var page = variables.ui.getPage();
+				// Initially hidden
+				expect( page.locator( "##hover-result" ).isVisible() ).toBeFalse();
+
+				// Hover to reveal
+				variables.ui.hover( "##hover-target" );
+				variables.ui.expectVisible( "##hover-result" );
+				variables.ui.expectText( "##hover-result", "You hovered!" );
+			} );
+
+			// ----- Drag and Drop -----
+
+			it( "should display drag source and drop target", () => {
+				variables.ui.expectVisible( "##drag-source" );
+				variables.ui.expectVisible( "##drop-target" );
+				variables.ui.expectText( "##drag-source", "Drag me" );
+				variables.ui.expectText( "##drop-target", "Drop here" );
+			} );
+
+			it( "should complete a drag and drop operation", () => {
+				variables.ui.dragAndDrop( "##drag-source", "##drop-target" );
+				variables.ui.expectText( "##drop-target", "Dropped!" );
+				expect( variables.ui.getAttribute( "##drop-target", "class" ) ).toInclude( "dropped" );
+			} );
+
+		} );
+
+	}
+
+}
