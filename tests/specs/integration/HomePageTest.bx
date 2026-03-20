@@ -10,6 +10,13 @@ class extends="tests.resources.BaseSpec" {
 
 	function run() {
 
+        variables.browserDefaults = {
+            "headless": false,
+            "slowMo"  : 1500
+        };
+
+        variables.browsers = [ "chromium" ];
+
 		forEachBrowser( "Home Page Tests", ( browserName ) => {
 
 			beforeEach( () => {
