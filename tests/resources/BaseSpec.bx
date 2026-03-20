@@ -13,31 +13,7 @@ class extends="testbox.system.BaseSpec" {
 
 	property name="baseURL" default="http://localhost:8080";
 
-	// ---------------------------------------------------------------------------
-	// Credentials
-	// ---------------------------------------------------------------------------
 
-	property name="testCredentials" default={
-		"valid": {
-			"email"   : "jramirez@ortussolutions.com",
-			"password": "mUjze3-xyqhom-kewhew@"
-		},
-		"invalid": {
-			"email"   : "invalid@example.com",
-			"password": "wrongpassword"
-		}
-	};
-
-	// ---------------------------------------------------------------------------
-	// Common Selectors
-	// ---------------------------------------------------------------------------
-
-	property name="selectors" default={
-		"emailInput"   : "input[type='email']",
-		"passwordInput": "input[type='password']",
-		"loginButton"  : "button[id='loginButton']",
-		"submitButton" : "button[type='submit'], button:has-text('Login'), button:has-text('Sign In')"
-	};
 
 	// ---------------------------------------------------------------------------
 	// Browser Defaults
@@ -45,7 +21,7 @@ class extends="testbox.system.BaseSpec" {
 
 	property name="browserDefaults" default={
 		"headless": false,
-		"slowMo"  : 500
+		"slowMo"  : 0
 	};
 
 	/** Browsers to run every test suite against. */
