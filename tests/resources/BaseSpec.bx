@@ -1,0 +1,69 @@
+/**
+ * BaseTest - Shared test configuration for all integration tests.
+ *
+ * Centralises host URLs, credentials, selectors, and browser settings
+ * so individual test specs stay focused on behaviour, not setup data.
+ * Extend this class instead of testbox.system.BaseSpec in your test files.
+ */
+class extends="testbox.system.BaseSpec" {
+
+	// ---------------------------------------------------------------------------
+	// Host / Environment
+	// ---------------------------------------------------------------------------
+
+	property name="baseURL" default="http://localhost:8080";
+
+	// ---------------------------------------------------------------------------
+	// Credentials
+	// ---------------------------------------------------------------------------
+
+	property name="testCredentials" default={
+		"valid": {
+			"email"   : "jramirez@ortussolutions.com",
+			"password": "mUjze3-xyqhom-kewhew@"
+		},
+		"invalid": {
+			"email"   : "invalid@example.com",
+			"password": "wrongpassword"
+		}
+	};
+
+	// ---------------------------------------------------------------------------
+	// Common Selectors
+	// ---------------------------------------------------------------------------
+
+	property name="selectors" default={
+		"emailInput"   : "input[type='email']",
+		"passwordInput": "input[type='password']",
+		"loginButton"  : "button[id='loginButton']",
+		"submitButton" : "button[type='submit'], button:has-text('Login'), button:has-text('Sign In')"
+	};
+
+	// ---------------------------------------------------------------------------
+	// Browser Defaults
+	// ---------------------------------------------------------------------------
+
+	property name="browserDefaults" default={
+		"headless": false,
+		"slowMo"  : 2000,
+		"browser" : "chromium"
+	};
+
+	// ---------------------------------------------------------------------------
+	// Helpers
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Create a PlaywrightService pre-configured with the shared settings.
+	 * Override browserDefaults in a subclass to customise per-suite.
+	 */
+	function createUI() {
+		return new tests.resources.PlaywrightService(
+			baseURL  = variables.baseURL,
+			headless = variables.browserDefaults.headless,
+			slowMo   = variables.browserDefaults.slowMo,
+			browser  = variables.browserDefaults.browser
+		);
+	}
+
+}

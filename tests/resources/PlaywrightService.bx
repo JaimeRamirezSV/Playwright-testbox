@@ -1,0 +1,337 @@
+/**
+ * BaseTestService - Reusable Playwright UI Test Service for BoxLang
+ *
+ * Encapsulates common Playwright browser actions behind a clean API,
+ * using Playwright's Java integration. All methods use locators (not deprecated selectors)
+ * and leverage Playwright's built-in auto-waiting.
+ *
+ * Design Decisions:
+ * - Wraps the Playwright Java API so test specs stay concise and readable.
+ * - Every element interaction resolves through page.locator() which auto-waits
+ *   for the element to be actionable, eliminating most explicit waits.
+ * - Error handling surfaces clear messages that include the selector/URL involved.
+ * - Browser lifecycle (create / close) is managed explicitly so callers can
+ *   control headless mode, slowMo, and browser type from their own setup.
+ */
+class {
+
+	property name="playwright";
+	property name="browser";
+	property name="page";
+	property name="baseURL" default="";
+
+	/**
+	 * Initialise the service and launch a browser.
+	 *
+	 * @baseURL   Root URL prepended to relative paths in goTo().
+	 * @headless  Run the browser without a visible window (default true).
+	 * @slowMo    Milliseconds to wait between each Playwright action (useful for demos).
+	 * @browser   Which browser engine to use: "chromium" (default), "firefox", or "webkit".
+	 *
+	 * @return    BaseTestService (fluent)
+	 */
+	function init(
+		string baseURL  = "",
+		boolean headless = true,
+		numeric slowMo   = 0,
+		string browser   = "chromium"
+	) {
+		variables.baseURL = arguments.baseURL;
+
+		variables.playwright = createObject( "java", "com.microsoft.playwright.Playwright" ).create();
+
+		var launchOptions = createObject( "java", "com.microsoft.playwright.BrowserType$LaunchOptions" )
+			.init()
+			.setHeadless( arguments.headless )
+			.setSlowMo( arguments.slowMo );
+
+		switch ( arguments.browser ) {
+			case "firefox":
+				variables.browser = variables.playwright.firefox().launch( launchOptions );
+				break;
+			case "webkit":
+				variables.browser = variables.playwright.webkit().launch( launchOptions );
+				break;
+			default:
+				variables.browser = variables.playwright.chromium().launch( launchOptions );
+		}
+
+		variables.page = variables.browser.newPage();
+
+		return this;
+	}
+
+	// ---------------------------------------------------------------------------
+	// Navigation
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Navigate to a URL. If the URL starts with "/" the baseURL is prepended.
+	 */
+	function goTo( required string url ) {
+		var target = arguments.url;
+		if ( left( target, 1 ) == "/" && len( variables.baseURL ) ) {
+			target = variables.baseURL & target;
+		}
+		try {
+			variables.page.navigate( target );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.NavigationError", message = "Failed to navigate to [#target#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/** Reload the current page. */
+	function reload() {
+		variables.page.reload();
+		return this;
+	}
+
+	/** Navigate back in history. */
+	function goBack() {
+		variables.page.goBack();
+		return this;
+	}
+
+	// ---------------------------------------------------------------------------
+	// Element Interactions
+	// ---------------------------------------------------------------------------
+
+	/** Click an element identified by the given selector. */
+	function click( required string selector ) {
+		try {
+			variables.page.locator( arguments.selector ).click();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.ClickError", message = "Failed to click [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/** Double-click an element. */
+	function doubleClick( required string selector ) {
+		try {
+			variables.page.locator( arguments.selector ).dblclick();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.DoubleClickError", message = "Failed to double-click [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/** Hover over an element. */
+	function hover( required string selector ) {
+		try {
+			variables.page.locator( arguments.selector ).hover();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.HoverError", message = "Failed to hover [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/** Check a checkbox or radio button. */
+	function check( required string selector ) {
+		try {
+			variables.page.locator( arguments.selector ).check();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.CheckError", message = "Failed to check [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/** Uncheck a checkbox. */
+	function uncheck( required string selector ) {
+		try {
+			variables.page.locator( arguments.selector ).uncheck();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.UncheckError", message = "Failed to uncheck [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	// ---------------------------------------------------------------------------
+	// Input Handling
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Clear and fill a field with the given value (triggers input/change events).
+	 */
+	function fill( required string selector, required string value ) {
+		try {
+			variables.page.locator( arguments.selector ).fill( arguments.value );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.FillError", message = "Failed to fill [#arguments.selector#] with value: #e.message#" );
+		}
+		return this;
+	}
+
+	/**
+	 * Type text character-by-character into an element (useful for fields with
+	 * key-by-key event handlers). Uses pressSequentially under the hood.
+	 */
+	function type( required string selector, required string value ) {
+		try {
+			variables.page.locator( arguments.selector ).pressSequentially( arguments.value );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.TypeError", message = "Failed to type into [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/** Send a keyboard key (e.g. "Enter", "Tab", "Escape"). */
+	function press( required string key ) {
+		try {
+			variables.page.keyboard().press( arguments.key );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.PressError", message = "Failed to press key [#arguments.key#]: #e.message#" );
+		}
+		return this;
+	}
+
+	// ---------------------------------------------------------------------------
+	// Assertions (using Playwright's built-in expect)
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Assert that an element matching the selector is visible on the page.
+	 */
+	function expectVisible( required string selector ) {
+		var assertLocator = createObject( "java", "com.microsoft.playwright.assertions.PlaywrightAssertions" );
+		try {
+			assertLocator.assertThat( variables.page.locator( arguments.selector ) ).isVisible();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.AssertionError", message = "Expected [#arguments.selector#] to be visible: #e.message#" );
+		}
+		return this;
+	}
+
+	/**
+	 * Assert that an element's text content contains the expected text.
+	 */
+	function expectText( required string selector, required string text ) {
+		var assertLocator = createObject( "java", "com.microsoft.playwright.assertions.PlaywrightAssertions" );
+		try {
+			assertLocator.assertThat( variables.page.locator( arguments.selector ) ).containsText( arguments.text );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.AssertionError", message = "Expected [#arguments.selector#] to contain text [#arguments.text#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/**
+	 * Assert that the current page URL contains the expected string.
+	 */
+	function expectURL( required string url ) {
+		var assertPage = createObject( "java", "com.microsoft.playwright.assertions.PlaywrightAssertions" );
+		try {
+			assertPage.assertThat( variables.page ).hasURL( javacast( "java.util.regex.Pattern", createObject( "java", "java.util.regex.Pattern" ).compile( ".*" & arguments.url & ".*" ) ) );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.AssertionError", message = "Expected URL to contain [#arguments.url#] but was [#variables.page.url()#]: #e.message#" );
+		}
+		return this;
+	}
+
+	// ---------------------------------------------------------------------------
+	// Waiting Utilities
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Wait for an element matching the selector to appear in the DOM.
+	 * Only use when you need to synchronise on dynamic content that Playwright's
+	 * auto-wait doesn't cover (e.g. elements added after an async operation).
+	 */
+	function waitForSelector( required string selector ) {
+		try {
+			variables.page.locator( arguments.selector ).waitFor();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.WaitError", message = "Timed out waiting for selector [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/**
+	 * Wait until the page URL matches the expected pattern.
+	 */
+	function waitForURL( required string url ) {
+		try {
+			variables.page.waitForURL( "**#arguments.url#**" );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.WaitError", message = "Timed out waiting for URL [#arguments.url#]: #e.message#" );
+		}
+		return this;
+	}
+
+	// ---------------------------------------------------------------------------
+	// Advanced Interactions
+	// ---------------------------------------------------------------------------
+
+	/** Select an option from a <select> element by value. */
+	function selectOption( required string selector, required string value ) {
+		try {
+			variables.page.locator( arguments.selector ).selectOption( arguments.value );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.SelectError", message = "Failed to select option [#arguments.value#] in [#arguments.selector#]: #e.message#" );
+		}
+		return this;
+	}
+
+	/** Drag an element and drop it onto another element. */
+	function dragAndDrop( required string source, required string target ) {
+		try {
+			variables.page.locator( arguments.source ).dragTo( variables.page.locator( arguments.target ) );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.DragDropError", message = "Failed to drag [#arguments.source#] to [#arguments.target#]: #e.message#" );
+		}
+		return this;
+	}
+
+	// ---------------------------------------------------------------------------
+	// Utilities
+	// ---------------------------------------------------------------------------
+
+	/** Return the raw Playwright Page object for advanced / one-off usage. */
+	function getPage() {
+		return variables.page;
+	}
+
+	/** Return the current page URL. */
+	function getCurrentURL() {
+		return variables.page.url();
+	}
+
+	/** Return the current page title. */
+	function getTitle() {
+		return variables.page.title();
+	}
+
+	/** Get the text content of an element. */
+	function getText( required string selector ) {
+		try {
+			return variables.page.locator( arguments.selector ).textContent();
+		} catch ( any e ) {
+			throw( type = "BaseTestService.GetTextError", message = "Failed to get text from [#arguments.selector#]: #e.message#" );
+		}
+	}
+
+	/** Get the value of an element attribute. */
+	function getAttribute( required string selector, required string attribute ) {
+		try {
+			return variables.page.locator( arguments.selector ).getAttribute( arguments.attribute );
+		} catch ( any e ) {
+			throw( type = "BaseTestService.GetAttributeError", message = "Failed to get attribute [#arguments.attribute#] from [#arguments.selector#]: #e.message#" );
+		}
+	}
+
+	/**
+	 * Close the browser and release Playwright resources.
+	 * Call this in afterEach / afterAll to prevent resource leaks.
+	 */
+	function close() {
+		if ( !isNull( variables.browser ) ) {
+			variables.browser.close();
+		}
+		if ( !isNull( variables.playwright ) ) {
+			variables.playwright.close();
+		}
+		return this;
+	}
+
+}
