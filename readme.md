@@ -48,7 +48,7 @@ mvn install
 This downloads the Playwright JARs and their transitive dependencies into `tests/lib/`. The `Application.bx` files are already configured to load JARs from this directory via `this.javaSettings.loadPaths`.
 
 
-### 3. Start the Application Under Test
+### 3. Start the Application
 
 Make sure the target web application is running. For local development:
 
