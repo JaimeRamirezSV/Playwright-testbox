@@ -8,11 +8,11 @@
             "enable":true
         },
         "http":{
-            "port":"8054"
+            "port":"4099"
         },
         "ssl":{
             "enable":true,
-            "port":"8055"
+            "port":"9099"
         }
     },
     "jvm":{
