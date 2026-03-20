@@ -1,5 +1,5 @@
 {
-    "name":"Playwright for timebox",
+    "name":"Playwright Test Server",
     "profile":"development",
     "force":true,
     "web":{
