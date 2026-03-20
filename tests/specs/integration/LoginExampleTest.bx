@@ -21,55 +21,10 @@ class extends="tests.resources.BaseSpec" {
 				variables.ui.close();
 			} );
 
-			// ----- Page load verifications -----
 
 			it( "should load the login page with correct title", () => {
 				expect( variables.ui.getTitle() ).toInclude( "TIMEBOX" );
 			} ); 
-
-			/* it( "should display all login form elements", () => {
-				variables.ui
-					.expectVisible( variables.selectors.emailInput )
-					.expectVisible( variables.selectors.passwordInput )
-					.expectVisible( variables.selectors.submitButton );
-			} ); */
-
-			// ----- Input & attribute checks -----
-
-			/* it( "should mask the password field", () => {
-				expect( variables.ui.getAttribute( variables.selectors.passwordInput, "type" ) ).toBe( "password" );
-			} ); */
-
-			// ----- Invalid credentials flow -----
-
-			/* it( "should reject invalid credentials and stay on login", () => {
-				variables.ui
-					.fill( variables.selectors.emailInput, variables.testCredentials.invalid.email )
-					.fill( variables.selectors.passwordInput, variables.testCredentials.invalid.password )
-					.click( variables.selectors.submitButton )
-					.waitForURL( "/login" );
-
-				expect( variables.ui.getCurrentURL() ).toInclude( "/login" );
-			} ); */
-
-			// ----- Empty submission -----
-
-			/* it( "should stay on login when submitting empty form", () => {
-				variables.ui.click( variables.selectors.loginButton );
-				expect( variables.ui.getCurrentURL() ).toInclude( "/login" );
-			} ); */
-
-			// ----- Valid credentials flow -----
-
-			/* it( "should redirect to dashboard after valid login", () => {
-				variables.ui
-					.fill( variables.selectors.emailInput, variables.testCredentials.valid.email )
-					.fill( variables.selectors.passwordInput, variables.testCredentials.valid.password )
-					.click( variables.selectors.loginButton )
-					.waitForURL( "/dashboard" );
-
-				expect( variables.ui.getCurrentURL() ).toInclude( "/dashboard" );
-			} ); */
 
 		} );
 
