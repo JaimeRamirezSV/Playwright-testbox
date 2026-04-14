@@ -1,8 +1,8 @@
 /**
- * BaseTest - Shared test configuration for all integration tests.
+ * BaseSpec - Shared test configuration and Playwright integration for all E2E tests.
  *
- * Centralises host URLs, credentials, selectors, and browser settings
- * so individual test specs stay focused on behaviour, not setup data.
+ * Centralises host URLs, credentials, browser settings, and Playwright browser
+ * lifecycle so individual test specs stay focused on behaviour, not setup data.
  * Extend this class instead of testbox.system.BaseSpec in your test files.
  */
 class extends="testbox.system.BaseSpec" {
@@ -13,7 +13,13 @@ class extends="testbox.system.BaseSpec" {
 
 	property name="baseURL" default="http://localhost:8080";
 
+	// ---------------------------------------------------------------------------
+	// Playwright Instances
+	// ---------------------------------------------------------------------------
 
+	property name="playwright";
+	property name="browser";
+	property name="page";
 
 	// ---------------------------------------------------------------------------
 	// Browser Defaults
@@ -32,24 +38,101 @@ class extends="testbox.system.BaseSpec" {
 	// ---------------------------------------------------------------------------
 
 	/**
-	 * Create a PlaywrightService pre-configured with the shared settings.
+	 * Create a Playwright UI session pre-configured with the shared settings.
+	 * Launches a browser, opens a new page, and returns this instance
+	 * so callers can use variables.page directly.
 	 *
 	 * @browser  Override the browser engine for this instance (e.g. "firefox").
+	 * @return   BaseSpec (fluent) — access the page via variables.page.
 	 */
 	function createUI( string browser = "chromium" ) {
-		return new tests.resources.PlaywrightService(
-			baseURL  = variables.baseURL,
-			headless = variables.browserDefaults.headless,
-			slowMo   = variables.browserDefaults.slowMo,
-			browser  = arguments.browser
-		);
+		variables.playwright = createObject( "java", "com.microsoft.playwright.Playwright" ).create();
+
+		var launchOptions = createObject( "java", "com.microsoft.playwright.BrowserType$LaunchOptions" )
+			.init()
+			.setHeadless( variables.browserDefaults.headless )
+			.setSlowMo( variables.browserDefaults.slowMo );
+
+		switch ( arguments.browser ) {
+			case "firefox":
+				variables.browser = variables.playwright.firefox().launch( launchOptions );
+				break;
+			case "webkit":
+				variables.browser = variables.playwright.webkit().launch( launchOptions );
+				break;
+			default:
+				variables.browser = variables.playwright.chromium().launch( launchOptions );
+		}
+
+		variables.page = variables.browser.newPage();
+
+		return this;
+	}
+
+	/**
+	 * Navigate to a path, prepending the baseURL.
+	 *
+	 * @path  The relative URL path (e.g. "/index.bxm").
+	 */
+	function goTo( required string path ) {
+		variables.page.navigate( variables.baseURL & arguments.path );
+		return this;
+	}
+
+	/**
+	 * Close the browser and Playwright instance.
+	 */
+	function close() {
+		if ( !isNull( variables.page ) )       variables.page.close();
+		if ( !isNull( variables.browser ) )    variables.browser.close();
+		if ( !isNull( variables.playwright ) )  variables.playwright.close();
+	}
+
+
+	/**
+	 * Get the AriaRole enum value for Playwright's getByRole().
+	 *
+	 * @role  The role name (e.g. "heading", "button", "form", "link", "alert", "banner", "dialog", "navigation", "main", "region").
+	 * @return java AriaRole enum value
+	 */
+	function ariaRole( required string role ) {
+		var AriaRole = createObject( "java", "com.microsoft.playwright.options.AriaRole" );
+		switch ( arguments.role ) {
+			case "alert":       return AriaRole.ALERT;
+			case "banner":      return AriaRole.BANNER;
+			case "button":      return AriaRole.BUTTON;
+			case "dialog":      return AriaRole.DIALOG;
+			case "form":        return AriaRole.FORM;
+			case "heading":     return AriaRole.HEADING;
+			case "link":        return AriaRole.LINK;
+			case "list":        return AriaRole.LIST;
+			case "listitem":    return AriaRole.LISTITEM;
+			case "main":        return AriaRole.MAIN;
+			case "navigation":  return AriaRole.NAVIGATION;
+			case "region":      return AriaRole.REGION;
+			case "status":      return AriaRole.STATUS;
+			case "textbox":     return AriaRole.TEXTBOX;
+			default:            throw( message="Unknown AriaRole: #arguments.role#" );
+		}
+	}
+
+	/**
+	 * Create a GetByRoleOptions object with the given name filter.
+	 *
+	 * @name  The accessible name to match.
+	 * @return java Page.GetByRoleOptions
+	 */
+	function roleOpts( required string name ) {
+		return createObject( "java", "com.microsoft.playwright.Page$GetByRoleOptions" )
+			.init()
+			.setName( arguments.name );
 	}
 
 	/**
 	 * Run a block of specs once per browser engine.
 	 *
 	 * Usage inside run():
-	 *   forEachBrowser( ( browserName ) => {
+	 *   forEachBrowser( "Login Tests", ( browserName ) => {
 	 *       beforeEach( () => { variables.ui = createUI( browserName ); ... } );
 	 *       it( "should ...", () => { ... } );
 	 *   } );
@@ -59,8 +142,8 @@ class extends="testbox.system.BaseSpec" {
 	 *   [firefox]  Login Tests
 	 *   [webkit]   Login Tests
 	 *
-	 * @label    Optional suite label. Defaults to "Cross-browser tests".
-	 * @body     Closure that receives the browser name as its single argument.
+	 * @label  Suite label for the describe block.
+	 * @specs  Closure that receives the browser name as its single argument.
 	 */
 	function forEachBrowser( required string label, required function specs ) {
 		var suiteLabel = label;
