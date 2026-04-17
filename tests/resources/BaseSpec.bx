@@ -33,7 +33,7 @@ class extends="testbox.system.BaseSpec" {
 	/** Browsers to run every test suite against. */
 	property name="browsers" default=[ "chromium", "firefox", "webkit" ];
 
-	property name="device" default="Galaxy S9+";
+	property name="device" default="";
 
 	// ---------------------------------------------------------------------------
 	// Helpers
