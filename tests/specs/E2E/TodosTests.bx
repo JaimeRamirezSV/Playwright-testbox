@@ -1,0 +1,112 @@
+/**
+ * Todos Page E2E Tests
+ *
+ * Tests based on /pages/todos.bxm behavior:
+ * auth redirect, dashboard render, add todo, edit modal, delete confirmation.
+ */
+class extends="tests.resources.BaseSpec" {
+
+	function run() {
+
+		describe( "Todos Page", function() {
+
+			variables.browserDefaults = {
+				"headless": false,
+				"slowMo"  : 1500
+			};
+
+			variables.browsers = [ "webkit", /* "chromium", "firefox" */ ];
+			variables.device = "iPad Pro 11";
+
+			forEachBrowser( "Todos Page Tests", ( browserName ) => {
+
+				beforeEach( () => {
+					variables.ui = createUI( browserName );
+				} );
+
+				afterEach( () => {
+					variables.ui.close();
+				} );
+
+				it( "should redirect unauthenticated users to login", () => {
+					goTo( "/pages/todos.bxm" );
+					expect( variables.page.url() ).toInclude( "/pages/login.bxm" );
+				} );
+
+				it( "should render todo dashboard after login", () => {
+					loginAsAdmin();
+					expect( variables.page.url() ).toInclude( "/pages/todos.bxm" );
+
+					var statsRegion = variables.page.getByRole( ariaRole( "region" ), roleOpts( "Todo statistics" ) );
+					expect( statsRegion.isVisible() ).toBeTrue();
+
+					var addForm = variables.page.getByRole( ariaRole( "form" ), roleOpts( "Add todo" ) );
+					expect( addForm.isVisible() ).toBeTrue();
+				} );
+
+				it( "should add a new todo and display success toast", () => {
+					loginAsAdmin();
+
+					var title = "E2E Added Todo " & dateTimeFormat( now(), "yyyymmddHHnnss" );
+					variables.page.getByLabel( "New todo title" ).fill( title );
+					variables.page.getByRole( ariaRole( "button" ), roleOpts( "Add Todo" ) ).click();
+
+					var toast = variables.page.getByRole( ariaRole( "status" ) );
+					expect( toast.isVisible() ).toBeTrue();
+					expect( toast.textContent() ).toInclude( "Todo added successfully" );
+					expect( variables.page.getByText( title ).isVisible() ).toBeTrue();
+				} );
+
+				it( "should open and close the edit modal", () => {
+					loginAsAdmin();
+					seedTodo( "E2E Edit Seed " & dateTimeFormat( now(), "yyyymmddHHnnss" ) );
+
+					variables.page.getByRole( ariaRole( "button" ), roleOpts( "Edit" ) ).first().click();
+					var editDialog = variables.page.getByRole( ariaRole( "dialog" ), roleOpts( "Edit todo" ) );
+					expect( editDialog.isVisible() ).toBeTrue();
+
+					variables.page.getByRole( ariaRole( "button" ), roleOpts( "Cancel" ) ).first().click();
+					var editActive = variables.page.evaluate( "document.getElementById('editOverlay').classList.contains('active')" );
+					expect( editActive ).toBeFalse();
+				} );
+
+				it( "should open and close delete confirmation", () => {
+					loginAsAdmin();
+					seedTodo( "E2E Delete Seed " & dateTimeFormat( now(), "yyyymmddHHnnss" ) );
+
+					variables.page.getByRole( ariaRole( "button" ), roleOpts( "Delete" ) ).first().click();
+					var deleteDialog = variables.page.getByRole( ariaRole( "dialog" ), roleOpts( "Confirm delete" ) );
+					expect( deleteDialog.isVisible() ).toBeTrue();
+
+					variables.page.getByRole( ariaRole( "button" ), roleOpts( "Cancel" ) ).last().click();
+					var deleteActive = variables.page.evaluate( "document.getElementById('deleteOverlay').classList.contains('active')" );
+					expect( deleteActive ).toBeFalse();
+				} );
+
+			} );
+
+		} );
+
+	}
+
+	/**
+	 * Logs in with default seeded credentials and lands on todos page.
+	 */
+	function loginAsAdmin() {
+		goTo( "/pages/login.bxm" );
+		variables.page.getByLabel( "Username" ).fill( "admin" );
+		variables.page.getByLabel( "Password" ).fill( "admin123" );
+		variables.page.getByRole( ariaRole( "button" ), roleOpts( "Sign In" ) ).click();
+		expect( variables.page.url() ).toInclude( "/pages/todos.bxm" );
+	}
+
+	/**
+	 * Adds a todo item through the UI to ensure list actions have a target.
+	 */
+	function seedTodo( required string title ) {
+		variables.page.getByLabel( "New todo title" ).fill( arguments.title );
+		variables.page.getByRole( ariaRole( "button" ), roleOpts( "Add Todo" ) ).click();
+		expect( variables.page.url() ).toInclude( "/pages/todos.bxm" );
+	}
+
+}
