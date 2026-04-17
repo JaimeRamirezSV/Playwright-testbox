@@ -18,7 +18,7 @@ class extends="tests.resources.BaseSpec" {
 
 			variables.browsers = [ "webkit", "chromium", "firefox" ];
 
-			//variables.device = "iPhone 14 Pro Max";
+			variables.device = "iPad Pro 11";
 
 			forEachBrowser( "Login Page Tests", ( browserName ) => {
 

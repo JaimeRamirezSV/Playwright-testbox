@@ -69,15 +69,19 @@ class extends="testbox.system.BaseSpec" {
 		// If a device is set, create a context with device emulation
 		if ( len( variables.device ) ) {
 			var d = getDevicePreset( variables.device );
-			variables.context = variables.browser.newContext(
-				createObject( "java", "com.microsoft.playwright.Browser$NewContextOptions" )
-					.init()
-					.setUserAgent( d.userAgent )
-					.setViewportSize( d.width, d.height )
-					.setDeviceScaleFactor( d.scaleFactor )
-					.setIsMobile( d.isMobile )
-					.setHasTouch( d.hasTouch )
-			);
+			var contextOptions = createObject( "java", "com.microsoft.playwright.Browser$NewContextOptions" )
+				.init()
+				.setUserAgent( d.userAgent )
+				.setViewportSize( d.width, d.height )
+				.setDeviceScaleFactor( d.scaleFactor )
+				.setHasTouch( d.hasTouch );
+
+			// Firefox does not support the isMobile context option.
+			if ( arguments.browser != "firefox" ) {
+				contextOptions.setIsMobile( d.isMobile );
+			}
+
+			variables.context = variables.browser.newContext( contextOptions );
 			variables.page = variables.context.newPage();
 		} else {
 			variables.page = variables.browser.newPage();
