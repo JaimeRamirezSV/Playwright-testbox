@@ -96,7 +96,13 @@ class extends="testbox.system.BaseSpec" {
 	 * @path  The relative URL path (e.g. "/index.bxm").
 	 */
 	function goTo( required string path ) {
-		variables.page.navigate( variables.baseURL & arguments.path );
+		try {
+			variables.page.navigate( variables.baseURL & arguments.path );
+		} catch ( any e ) {
+			// If navigation fails (e.g., host unavailable), close resources immediately.
+			close();
+			rethrow;
+		}
 		return this;
 	}
 
