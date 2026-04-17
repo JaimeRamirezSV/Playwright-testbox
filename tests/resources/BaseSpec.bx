@@ -20,7 +20,6 @@ class extends="testbox.system.BaseSpec" {
 	property name="playwright";
 	property name="browser";
 	property name="page";
-	property name="device";
 
 	// ---------------------------------------------------------------------------
 	// Browser Defaults
@@ -34,7 +33,7 @@ class extends="testbox.system.BaseSpec" {
 	/** Browsers to run every test suite against. */
 	property name="browsers" default=[ "chromium", "firefox", "webkit" ];
 
-	property name="devices" default=[ "iPhone 14", "iPhone 14 Pro Max" ];
+	property name="device" default="Galaxy S9+";
 
 	// ---------------------------------------------------------------------------
 	// Helpers
@@ -68,7 +67,7 @@ class extends="testbox.system.BaseSpec" {
 		}
 
 		// If a device is set, create a context with device emulation
-		if ( len( variables.devices ) ) {
+		if ( len( variables.device ) ) {
 			var d = getDevicePreset( variables.device );
 			variables.context = variables.browser.newContext(
 				createObject( "java", "com.microsoft.playwright.Browser$NewContextOptions" )
