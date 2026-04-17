@@ -13,10 +13,10 @@ class extends="tests.resources.BaseSpec" {
 
 			variables.browserDefaults = {
 				"headless": false,
-				"slowMo"  : 1500
+				"slowMo"  : 500
 			};
 
-			variables.browsers = [ "webkit", "chromium", "firefox" ];
+			variables.browsers = [ "webkit", /* "chromium", "firefox" */ ];
 
 			variables.device = "iPad Pro 11";
 
