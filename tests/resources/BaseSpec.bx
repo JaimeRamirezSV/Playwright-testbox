@@ -20,6 +20,7 @@ class extends="testbox.system.BaseSpec" {
 	property name="playwright";
 	property name="browser";
 	property name="page";
+	property name="device";
 
 	// ---------------------------------------------------------------------------
 	// Browser Defaults
@@ -32,6 +33,8 @@ class extends="testbox.system.BaseSpec" {
 
 	/** Browsers to run every test suite against. */
 	property name="browsers" default=[ "chromium", "firefox", "webkit" ];
+
+	property name="devices" default=[ "iPhone 14", "iPhone 14 Pro Max" ];
 
 	// ---------------------------------------------------------------------------
 	// Helpers
@@ -64,7 +67,22 @@ class extends="testbox.system.BaseSpec" {
 				variables.browser = variables.playwright.chromium().launch( launchOptions );
 		}
 
-		variables.page = variables.browser.newPage();
+		// If a device is set, create a context with device emulation
+		if ( len( variables.devices ) ) {
+			var d = getDevicePreset( variables.device );
+			variables.context = variables.browser.newContext(
+				createObject( "java", "com.microsoft.playwright.Browser$NewContextOptions" )
+					.init()
+					.setUserAgent( d.userAgent )
+					.setViewportSize( d.width, d.height )
+					.setDeviceScaleFactor( d.scaleFactor )
+					.setIsMobile( d.isMobile )
+					.setHasTouch( d.hasTouch )
+			);
+			variables.page = variables.context.newPage();
+		} else {
+			variables.page = variables.browser.newPage();
+		}
 
 		return this;
 	}
@@ -80,10 +98,51 @@ class extends="testbox.system.BaseSpec" {
 	}
 
 	/**
+	 * Get a device preset for emulation.
+	 *
+	 * @deviceName  Device name (e.g. "iPhone 14", "Pixel 7", "iPad Pro 11").
+	 * @return      Struct with userAgent, width, height, scaleFactor, isMobile, hasTouch.
+	 */
+	function getDevicePreset( required string deviceName ) {
+		var devices = {
+			"iPhone 14": {
+				userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+				width: 390, height: 844, scaleFactor: 3, isMobile: true, hasTouch: true
+			},
+			"iPhone 14 Pro Max": {
+				userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+				width: 430, height: 932, scaleFactor: 3, isMobile: true, hasTouch: true
+			},
+			"iPhone 13": {
+				userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1",
+				width: 390, height: 844, scaleFactor: 3, isMobile: true, hasTouch: true
+			},
+			"Pixel 7": {
+				userAgent: "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36",
+				width: 412, height: 915, scaleFactor: 2.625, isMobile: true, hasTouch: true
+			},
+			"Galaxy S9+": {
+				userAgent: "Mozilla/5.0 (Linux; Android 8.0.0; SM-G965U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36",
+				width: 320, height: 658, scaleFactor: 4.5, isMobile: true, hasTouch: true
+			},
+			"iPad Pro 11": {
+				userAgent: "Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+				width: 834, height: 1194, scaleFactor: 2, isMobile: true, hasTouch: true
+			}
+		};
+
+		if ( !structKeyExists( devices, arguments.deviceName ) ) {
+			throw( message="Unknown device preset: #arguments.deviceName#. Available: #structKeyList( devices )#" );
+		}
+		return devices[ arguments.deviceName ];
+	}
+
+	/**
 	 * Close the browser and Playwright instance.
 	 */
 	function close() {
 		if ( !isNull( variables.page ) )       variables.page.close();
+		if ( !isNull( variables.context ) )    variables.context.close();
 		if ( !isNull( variables.browser ) )    variables.browser.close();
 		if ( !isNull( variables.playwright ) )  variables.playwright.close();
 	}
