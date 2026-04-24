@@ -1,40 +1,82 @@
 class {
-    this.name                 = "My Testing Suite"
+    /**
+     * --------------------------------------------------------------------------
+     * Application Properties: Modify as you see fit!
+     * --------------------------------------------------------------------------
+     */
+    this.name                 = "My BoxLang Application"
     this.sessionManagement    = true
+    this.sessionTimeout       = createTimespan( 0, 1, 0, 0 )
     this.setClientCookies     = true
-    this.sessionTimeout       = createTimespan( 0, 0, 15, 0 )
-    this.applicationTimeout   = createTimespan( 0, 0, 15, 0 )
+    this.setDomainCookies     = true
+    this.timezone             = "UTC"
     this.whiteSpaceManagement = "smart"
 
-    this.javaSettings = {
-        loadPaths = [ getDirectoryFromPath( getCurrentTemplatePath() ) & "lib" ],
-        reloadOnChange = false
-    }
-    
+    /**
+     * --------------------------------------------------------------------------
+     * Java Integration
+     * --------------------------------------------------------------------------
+     */
+    this.javaSettings = {}
+
     /**
      * --------------------------------------------------------------------------
      * Location Mappings
      * --------------------------------------------------------------------------
-     * - root : Quick reference to root application
-     * - testbox : Where TestBox is installed
      */
-    // Create testing mapping
-    this.mappings[ "/tests" ]   = getDirectoryFromPath( getCurrentTemplatePath() )
-    // The root application mapping
-    rootPath                    = reReplaceNoCase( this.mappings[ "/tests" ], "tests(\\|/)", "" )
-    this.mappings[ "/root" ]    = rootPath
-    this.mappings[ "/testbox" ] = rootPath & "testbox"
-    
+    this.mappings[ "/root" ]   = getDirectoryFromPath( getCurrentTemplatePath() )
+
     /**
-     * Fires on every test request. It builds a Virtual application for you
+     * --------------------------------------------------------------------------
+     * ORM + Datasource Settings
+     * --------------------------------------------------------------------------
+     */
+    this.datasource = ""
+
+    /**
+     * Fires when the application starts
+     */
+    public boolean function onApplicationStart() {
+        return true
+    }
+
+    /**
+     * Fires when the application ends
+     *
+     * @appScope The app scope
+     */
+    public void function onApplicationEnd( struct appScope ) {
+    }
+
+    /**
+     * Fires on every request
      *
      * @targetPage The requested page
      */
-    public boolean function onRequestStart( targetPage ) {
-        // Set a high timeout for long running tests
-        bx:setting requestTimeout = "9999";
-        // Any global request start code
-        
+    public boolean function onRequestStart( string targetPage ) {
         return true
+    }
+
+    /**
+     * Fires on every session start
+     */
+    public void function onSessionStart() {
+    }
+
+    /**
+     * Fires on session end
+     *
+     * @sessionScope The session scope
+     * @appScope     The app scope
+     */
+    public void function onSessionEnd( struct sessionScope, struct appScope ) {
+    }
+
+    /**
+     * On missing template handler
+     *
+     * @template
+     */
+    public boolean function onMissingTemplate( template ) {
     }
 }

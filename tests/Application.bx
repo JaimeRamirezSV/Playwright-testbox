@@ -7,7 +7,7 @@ class {
     this.whiteSpaceManagement = "smart"
 
     this.javaSettings = {
-        loadPaths = [ "./lib" ],
+        loadPaths = [ getDirectoryFromPath( getCurrentTemplatePath() ) & "lib" ],
         reloadOnChange = false
     }
     
