@@ -216,6 +216,9 @@ class extends="testbox.system.BaseSpec" {
 	function forEachBrowser( required string label, required function specs ) {
 		var suiteLabel = label;
 		var suiteSpecs = specs;
+
+		Println( "Running suite: #suiteLabel# for browsers: #arrayToList( variables.browsers )#" );
+
 		for ( var browserName in variables.browsers ) {
 			describe( "[#browserName#] #suiteLabel#", () => {
 				suiteSpecs( browserName );
