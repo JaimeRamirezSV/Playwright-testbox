@@ -148,12 +148,25 @@ class extends="testbox.system.BaseSpec" {
 
 	/**
 	 * Close the browser and Playwright instance.
+	 * Safe to call multiple times — variables are nulled after closing.
 	 */
 	function close() {
-		if ( !isNull( variables.page ) )       variables.page.close();
-		if ( !isNull( variables.context ) )    variables.context.close();
-		if ( !isNull( variables.browser ) )    variables.browser.close();
-		if ( !isNull( variables.playwright ) )  variables.playwright.close();
+		if ( !isNull( variables.page ) ) {
+			variables.page.close();
+			variables.page = nullValue();
+		}
+		if ( !isNull( variables.context ) ) {
+			variables.context.close();
+			variables.context = nullValue();
+		}
+		if ( !isNull( variables.browser ) ) {
+			variables.browser.close();
+			variables.browser = nullValue();
+		}
+		if ( !isNull( variables.playwright ) ) {
+			variables.playwright.close();
+			variables.playwright = nullValue();
+		}
 	}
 
 
