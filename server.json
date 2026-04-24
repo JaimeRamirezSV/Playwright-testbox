@@ -21,7 +21,7 @@
     },
     "app":{
         "serverHomeDirectory":".engine/boxlang",
-        "cfengine":"boxlang@1.10.1"
+        "cfengine":"boxlang@1.12.0"
     },
     "env":{
         "BOXLANG_DEBUG":true
