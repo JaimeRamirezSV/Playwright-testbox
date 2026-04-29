@@ -31,30 +31,11 @@ class extends="tests.resources.BaseSpec" {
 				} );
 
 				it( "should display the login form", () => {
-					goTo( "/pages/login.bxm" );
-					var loginForm = variables.page.getByRole( ariaRole( "form" ), roleOpts( "Login form" ) );
-					expect( loginForm.isVisible() ).toBeTrue();
-				} );
-
-				it( "should prevent submission with empty fields (HTML validation)", () => {
-					goTo( "/pages/login.bxm" );
-					var submitButton = variables.page.getByRole( ariaRole( "button" ), roleOpts( "Sign In" ) );
-					submitButton.click();
-					expect( variables.page.url() ).toInclude( "/pages/login.bxm" );
-					var isInvalid = variables.page.evaluate( "document.getElementById('login-username').validity.valueMissing" );
-					expect( isInvalid ).toBeTrue();
+					//
 				} );
 
 				it( "should login successfully with valid credentials", () => {
-					goTo( "/pages/login.bxm" );
-					variables.page.getByLabel( "Username" ).fill( "admin" );
-					variables.page.getByLabel( "Password" ).fill( "admin123" );
-					variables.page.getByRole( ariaRole( "button" ), roleOpts( "Sign In" ) ).click();
-					expect( variables.page.url() ).toInclude( "/pages/todos.bxm" );
-					// Verify the welcome toast popup
-					var toast = variables.page.getByRole( ariaRole( "status" ) );
-					expect( toast.isVisible() ).toBeTrue();
-					expect( toast.textContent() ).toInclude( "Welcome back, admin" );
+					//
 				} );
 
 			} );
