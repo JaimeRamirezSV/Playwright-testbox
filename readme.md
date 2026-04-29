@@ -4,7 +4,7 @@ End-to-end UI tests for BoxLang web applications using [Playwright](https://play
 
 ## Prerequisites
 
-- [BoxLang](https://boxlang.io/) 1.10+
+- [BoxLang](https://boxlang.io/) 1.12+
 - [CommandBox](https://www.ortussolutions.com/products/commandbox)
 - Java 21 (JRE or JDK)
 - [Maven](https://maven.apache.org/) 3.x
