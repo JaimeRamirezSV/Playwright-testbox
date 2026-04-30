@@ -31,11 +31,25 @@ class extends="tests.resources.BaseSpec" {
 				} );
 
 				it( "should display the login form", () => {
-					//
+					goTo( "/pages/login.bxm" );
+					variables.page.waitForLoadState();
+					expect( variables.page.getByLabel( "Username" ).isVisible() ).toBeTrue();
+					expect( variables.page.getByLabel( "Password" ).isVisible() ).toBeTrue();
+					expect( variables.page.getByRole( ariaRole( "button" ), roleOpts( "Sign In" ) ).isVisible() ).toBeTrue();
+					expect( variables.page.url() ).toInclude( "/pages/login.bxm" );
 				} );
 
 				it( "should login successfully with valid credentials", () => {
-					//
+					goTo( "/pages/login.bxm" );
+					variables.page.waitForLoadState();
+					variables.page.getByLabel( "Username" ).fill( "admin" );
+					variables.page.getByLabel( "Password" ).fill( "admin123" );
+					variables.page.getByRole( ariaRole( "button" ), roleOpts( "Sign In" ) ).click();
+					expect( variables.page.url() ).toInclude( "/pages/todos.bxm" );
+					// Verify the welcome toast popup
+					var toast = variables.page.getByRole( ariaRole( "status" ) );
+					expect( toast.isVisible() ).toBeTrue();
+					expect( toast.textContent() ).toInclude( "Welcome back, admin" );
 				} );
 
 			} );
