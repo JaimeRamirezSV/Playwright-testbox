@@ -16,7 +16,7 @@ class extends="tests.resources.BaseSpec" {
 				"slowMo"  : 500
 			};
 
-			variables.browsers = [ /*"webkit", "chromium",*/ "firefox" ];
+			variables.browsers = [ "webkit", "chromium", "firefox" ];
 
 			variables.device = "iPad Pro 11";
 
